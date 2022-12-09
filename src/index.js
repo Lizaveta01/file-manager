@@ -3,24 +3,38 @@ import { stdin as input, stdout as output } from "node:process";
 import path from "path";
 
 import { divideCommandLine } from "./helpers/divideCommandLine.js";
-import { throwInvalidInput } from "./helpers/throwInvalidInput.js";
+import { throwInvalidInput } from "./helpers/throwError.js";
 import { getUserName } from "./helpers/getUserName.js";
 import * as operationOS from "./os/os.js";
+import * as navigation from "./navigation/navigation.js";
 
 const rl = readline.createInterface({ input, output });
 
 const user = getUserName();
+let currentDirectory = operationOS.getHomeDir();
+
 console.log(`Welcome to the File Manager, ${user}!`);
+console.log(`You are currently in ${currentDirectory}`);
 
 rl.on("line", (input) => {
   const [command, operation] = divideCommandLine(input);
-  console.log(command, operation);
+//   console.log(command, operation);
   switch (command) {
     case "up":
+      currentDirectory = navigation.up(currentDirectory);
+      console.log(`You are currently in ${currentDirectory}`);
+      rl.prompt();
       break;
     case "cd":
+      currentDirectory = navigation.cd(currentDirectory, operation);
+      console.log(`You are currently in ${currentDirectory}`);
+      rl.prompt();
       break;
     case "ls":
+      navigation.ls(currentDirectory).then((list) => {
+        console.table(list);
+        rl.prompt();
+      });
       break;
     case "cat":
       break;
@@ -74,5 +88,5 @@ rl.on("line", (input) => {
 });
 
 process.on("exit", (code) => {
-  console.log(`Thank you for using File Manager, ${user}!`);
+  console.log(`Thank you for using File Manager, ${user}, goodbye!`);
 });
