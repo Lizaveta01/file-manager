@@ -5,8 +5,17 @@ import path from "path";
 import { divideCommandLine } from "./helpers/divideCommandLine.js";
 import { throwInvalidInput } from "./helpers/throwError.js";
 import { getUserName } from "./helpers/getUserName.js";
+import { checkPath } from "./helpers/checkPath.js";
+
 import * as operationOS from "./os/os.js";
 import * as navigation from "./navigation/navigation.js";
+
+import { read } from "./basic-operations/read.js";
+import { add } from "./basic-operations/add.js";
+import { copy } from "./basic-operations/copy.js";
+import { remove } from "./basic-operations/delete.js";
+import { move } from "./basic-operations/move.js";
+import { rename } from "./basic-operations/rename.js";
 
 const rl = readline.createInterface({ input, output });
 
@@ -16,9 +25,8 @@ let currentDirectory = operationOS.getHomeDir();
 console.log(`Welcome to the File Manager, ${user}!`);
 console.log(`You are currently in ${currentDirectory}`);
 
-rl.on("line", (input) => {
+rl.on("line", async (input) => {
   const [command, operation] = divideCommandLine(input);
-//   console.log(command, operation);
   switch (command) {
     case "up":
       currentDirectory = navigation.up(currentDirectory);
@@ -37,22 +45,31 @@ rl.on("line", (input) => {
       });
       break;
     case "cat":
+      await read(currentDirectory, operation);
       break;
     case "add":
+      await add(currentDirectory, operation);
       break;
     case "rn":
+      await rename(checkPath(currentDirectory, operation));
       break;
     case "cp":
+      await copy(checkPath(currentDirectory, operation));
       break;
     case "mv":
+      await move(checkPath(currentDirectory, operation));
       break;
     case "rm":
+      await remove(path.resolve(currentDirectory, operation));
       break;
     case "hash":
+        //write function
       break;
     case "compress":
+         //write function
       break;
     case "decompress":
+         //write function
       break;
     case "os":
       switch (operation) {
