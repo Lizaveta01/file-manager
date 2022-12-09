@@ -1,7 +1,7 @@
 import os from 'os';
 
 export const getEOL = () => {
-    return os.EOL();
+    return JSON.stringify(os.EOL);
 };
 
 export const getCPUs = () => {
