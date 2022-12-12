@@ -1,10 +1,25 @@
+import fs from "fs";
 import path from "path";
 
 export const checkPath = (currentDirectory, paths) => {
   paths = paths.split(" ");
 
-  const oldPath = path.resolve(currentDirectory, paths[0]);
-  const newPath = path.resolve(currentDirectory, paths[1]);
+  let src,
+    dest,
+    tempPath = [];
 
-  return [oldPath, newPath];
+  paths.forEach((chunk) => {
+    tempPath.push(chunk);
+    if (
+      !src &&
+      fs.existsSync(path.resolve(currentDirectory, tempPath.join(" ")))
+    ) {
+      [src, tempPath] = [
+        path.resolve(currentDirectory, tempPath.join(" ")),
+        [],
+      ];
+    }
+  });
+  dest = path.resolve(currentDirectory, tempPath.join(" "));
+  return [src, dest];
 };

@@ -5,6 +5,7 @@ import { ConsoleOutput } from "../helpers/constants.js";
 
 const { noFileOrDirectory, noDirectory } = ConsoleOutput;
 export const up = (currentPath) => {
+  
   return resolve(currentPath, "..");
 };
 

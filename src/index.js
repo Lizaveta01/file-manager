@@ -17,6 +17,11 @@ import { remove } from "./basic-operations/delete.js";
 import { move } from "./basic-operations/move.js";
 import { rename } from "./basic-operations/rename.js";
 
+import { decompress } from "./zip/decompress.js";
+import { compress } from "./zip/compress.js";
+
+import { hash } from "./hash/hash.js";
+
 const rl = readline.createInterface({ input, output });
 
 const user = getUserName();
@@ -41,6 +46,7 @@ rl.on("line", async (input) => {
     case "ls":
       navigation.ls(currentDirectory).then((list) => {
         console.table(list);
+        console.log(`You are currently in ${currentDirectory}`);
         rl.prompt();
       });
       break;
@@ -51,41 +57,45 @@ rl.on("line", async (input) => {
       await add(currentDirectory, operation);
       break;
     case "rn":
-      await rename(checkPath(currentDirectory, operation));
+      await rename(checkPath(currentDirectory, operation), currentDirectory);
       break;
     case "cp":
-      await copy(checkPath(currentDirectory, operation));
+      await copy(checkPath(currentDirectory, operation), currentDirectory);
       break;
     case "mv":
-      await move(checkPath(currentDirectory, operation));
+      await move(checkPath(currentDirectory, operation), currentDirectory);
       break;
     case "rm":
-      await remove(path.resolve(currentDirectory, operation));
+      await remove(path.resolve(currentDirectory, operation), currentDirectory);
       break;
     case "hash":
-        //write function
+      await hash(currentDirectory, operation);
       break;
     case "compress":
-         //write function
+      await compress(checkPath(currentDirectory, operation), currentDirectory);
       break;
     case "decompress":
-         //write function
+      await decompress(
+        checkPath(currentDirectory, operation),
+        currentDirectory
+      );
+
       break;
     case "os":
       switch (operation) {
-        case "EOL":
+        case "--EOL":
           console.log(operationOS.getEOL());
           break;
-        case "cpus":
+        case "--cpus":
           console.log(operationOS.getCPUs());
           break;
-        case "homedir":
+        case "--homedir":
           console.log(operationOS.getHomeDir());
           break;
-        case "username":
+        case "--username":
           console.log(operationOS.getUserName());
           break;
-        case "architecture":
+        case "--architecture":
           console.log(operationOS.getArchitecture());
           break;
         default:
@@ -93,12 +103,14 @@ rl.on("line", async (input) => {
           rl.prompt();
           break;
       }
+      console.log(`You are currently in ${currentDirectory}`);
       rl.prompt();
       break;
     case ".exit":
       process.exit();
     default:
       throwInvalidInput();
+      console.log(`You are currently in ${currentDirectory}`);
       rl.prompt();
       break;
   }
