@@ -10,8 +10,7 @@ export const up = (currentPath) => {
 
 export const cd = (currentPath, additionPath) => {
   const newPath = resolve(currentPath, additionPath);
-  console.log("newPath", newPath);
-  console.log("additionPath", additionPath);
+
   if (!fs.existsSync(newPath)) console.log(noFileOrDirectory);
   else if (!fs.lstatSync(newPath).isDirectory()) console.log(noDirectory);
   return fs.existsSync(newPath) && fs.lstatSync(newPath).isDirectory()

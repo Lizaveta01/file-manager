@@ -45,10 +45,12 @@ export const copy = async ([currentPath, newPath], currentDirectory) => {
     });
 
     readStream.pipe(writeStream);
-    if (currentDirectory) return true;
+    return true;
   } catch (error) {
     console.log(error.message);
   } finally {
-    console.log(`You are currently in ${currentDirectory}`);
+    if (currentDirectory) {
+      console.log(`You are currently in ${currentDirectory}`);
+    }
   }
 };
