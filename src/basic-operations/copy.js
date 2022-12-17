@@ -1,5 +1,6 @@
 import fs from "fs";
 import fsPromises from "fs/promises";
+
 import path from "path";
 
 import { ConsoleOutput } from "../helpers/constants.js";
@@ -8,26 +9,46 @@ const { noFile } = ConsoleOutput;
 
 export const copy = async ([currentPath, newPath], currentDirectory) => {
   try {
+    if (!currentPath) {
+      throw new Error(noFile);
+    }
 
-  if (!currentPath) {
-    throw new Error
-  }
-  if (!fs.existsSync(newPath)) {
-    await fs.promises.mkdir(newPath);
-  }
+    if (!fs.existsSync(newPath)) {
+      await fs.promises.mkdir(newPath);
+    }
 
-  const readStream = fs.ReadStream(currentPath, "utf8");
-  const writeStream = fs.WriteStream(
-    path.resolve(newPath, path.basename(currentPath))
-  );
+    const stats = fs.lstatSync(newPath);
+    if (!stats.isDirectory()) {
+      throw new Error(
+        "Please, create a directory with a different name, because another file already have same name. Or change directory"
+      );
+    }
 
-  readStream.on("error", () => {return});
-  writeStream.on("error", () => {return});
+    const fileName = path.resolve(newPath, path.basename(currentPath));
 
-  readStream.pipe(writeStream);
-  if (currentDirectory)  console.log(`You are currently in ${currentDirectory}`)
-  return true;
-   } catch {
-    console.log(noFile);
+    if (fs.existsSync(path.resolve(newPath, fileName))) {
+      throw new Error(
+        `File with same name already exist in ${newPath}. Change filename before move`
+      );
+    }
+
+    const readStream = fs.ReadStream(currentPath, "utf8");
+    const writeStream = fs.WriteStream(
+      path.resolve(newPath, path.basename(currentPath))
+    );
+
+    readStream.on("error", () => {
+      return;
+    });
+    writeStream.on("error", () => {
+      return;
+    });
+
+    readStream.pipe(writeStream);
+    if (currentDirectory) return true;
+  } catch (error) {
+    console.log(error.message);
+  } finally {
+    console.log(`You are currently in ${currentDirectory}`);
   }
 };
