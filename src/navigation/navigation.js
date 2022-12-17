@@ -5,12 +5,13 @@ import { ConsoleOutput } from "../helpers/constants.js";
 
 const { noFileOrDirectory, noDirectory } = ConsoleOutput;
 export const up = (currentPath) => {
-  
   return resolve(currentPath, "..");
 };
 
 export const cd = (currentPath, additionPath) => {
   const newPath = resolve(currentPath, additionPath);
+  console.log("newPath", newPath);
+  console.log("additionPath", additionPath);
   if (!fs.existsSync(newPath)) console.log(noFileOrDirectory);
   else if (!fs.lstatSync(newPath).isDirectory()) console.log(noDirectory);
   return fs.existsSync(newPath) && fs.lstatSync(newPath).isDirectory()
@@ -31,7 +32,12 @@ export const ls = async (folder) => {
     };
     return itemInfo;
   });
-  const sortedFiles = TransformFiles.sort((a, b) => {
+
+  const filteredFiles = TransformFiles.filter(
+    (item) => item.type === "file" || item.type === "directory"
+  );
+
+  const sortedFiles = filteredFiles.sort((a, b) => {
     if (a.type > b.type) return 1;
     if (a.type < b.type) return -1;
     if (a.name < b.name) return -1;
