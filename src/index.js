@@ -2,6 +2,9 @@ import * as readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import path from "path";
 
+import * as operationOS from "./os/os.js";
+import * as navigation from "./navigation/navigation.js";
+
 import { divideCommandLine } from "./helpers/divideCommandLine.js";
 import { throwInvalidInput } from "./helpers/throwError.js";
 import { getUserName } from "./helpers/getUserName.js";
@@ -13,6 +16,11 @@ import { copy } from "./basic-operations/copy.js";
 import { remove } from "./basic-operations/delete.js";
 import { move } from "./basic-operations/move.js";
 import { rename } from "./basic-operations/rename.js";
+
+import { decompress } from "./zip/decompress.js";
+import { compress } from "./zip/compress.js";
+
+import { hash } from "./hash/hash.js";
 
 const rl = readline.createInterface({ input, output });
 
@@ -62,6 +70,43 @@ rl.on("line", async (input) => {
       break;
     case ".exit":
       process.exit();
+    case "hash":
+      await hash(currentDirectory, operation);
+      break;
+    case "compress":
+      await compress(checkPath(currentDirectory, operation), currentDirectory);
+      break;
+    case "decompress":
+      await decompress(
+        checkPath(currentDirectory, operation),
+        currentDirectory
+      );
+      break;
+    case "os":
+      switch (operation) {
+        case "--EOL":
+          console.log(operationOS.getEOL());
+          break;
+        case "--cpus":
+          console.log(operationOS.getCPUs());
+          break;
+        case "--homedir":
+          console.log(operationOS.getHomeDir());
+          break;
+        case "--username":
+          console.log(operationOS.getUserName());
+          break;
+        case "--architecture":
+          console.log(operationOS.getArchitecture());
+          break;
+        default:
+          throwInvalidInput();
+          rl.prompt();
+          break;
+      }
+      console.log(`You are currently in ${currentDirectory}`);
+      rl.prompt();
+      break;
     default:
       throwInvalidInput();
       console.log(`You are currently in ${currentDirectory}`);
